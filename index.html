@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini CRM — Clientes</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <div class="topbar">
+        <div>
+          <h1>Mini CRM</h1>
+          <p class="subtitle">Lista de clientes (Workshop: Construindo devs com IA)</p>
+        </div>
+
+        <div class="controls">
+          <label class="field">
+            <span>Perfil</span>
+            <select id="roleSelect" aria-label="Selecionar perfil">
+              <option value="viewer">Viewer (somente leitura)</option>
+              <option value="editor">Editor (pode editar/excluir)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Buscar</span>
+            <input id="searchInput" placeholder="Ex.: Ana, João, Maria..." />
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="meta">
+        <div class="pill" id="rolePill">Perfil atual: viewer</div>
+        <div class="pill" id="countPill">0 clientes</div>
+      </section>
+
+      <section id="list" class="grid" aria-label="Lista de clientes"></section>
+    </main>
+
+    <footer class="container footer">
+      <small>
+        Dica: no perfil <b>Viewer</b>, ações devem ficar visíveis porém bloqueadas e com tooltip.
+      </small>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
