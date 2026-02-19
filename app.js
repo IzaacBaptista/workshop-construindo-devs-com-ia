@@ -73,9 +73,6 @@ els.list.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-action]");
   if (!btn) return;
 
-  // Bloqueia ações para o perfil viewer
-  if (state.role === "viewer") return;
-
   const card = e.target.closest(".card");
   if (!card) return;
 
