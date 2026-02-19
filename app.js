@@ -42,12 +42,6 @@ function render() {
 
   els.list.innerHTML = data
     .map((c) => {
-      const isViewer = state.role === "viewer";
-
-      // Em viewer: fica visualmente desabilitado + tooltip (title)
-      const editClass = isViewer ? "is-disabled" : "";
-      const delClass = isViewer ? "is-disabled" : "";
-      const tooltip = isViewer ? ` title="Essa ação não é permitida para este perfil"` : "";
 
       return `
         <article class="card" data-id="${c.id}">
@@ -60,8 +54,8 @@ function render() {
           </div>
 
           <div class="actions">
-            <button class="${editClass}" data-action="edit"${tooltip}>Editar</button>
-            <button class="danger ${delClass}" data-action="delete"${tooltip}>Excluir</button>
+            <button class="" data-action="edit">Editar</button>
+            <button class="danger " data-action="delete">Excluir</button>
           </div>
         </article>
       `;
