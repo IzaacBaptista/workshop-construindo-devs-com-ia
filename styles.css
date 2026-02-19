@@ -138,7 +138,7 @@ button.danger:hover {
 /* "Desabilitado" visual */
 button.is-disabled {
   opacity: 0.45;
-  cursor: not-allowed;
+  cursor: default; /* remove o ícone de bloqueio */
   filter: grayscale(0.2);
 }
 button.is-disabled:hover {
