@@ -23,31 +23,17 @@ Quando `role = viewer`:
 Quando `role = editor`:
 - Botões devem funcionar normalmente
 
-## Correção aplicada
-
-Adicionado um guard de retorno antecipado no início do handler de clique em `app.js`:
-
-```js
-els.list.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action]");
-  if (!btn) return;
-
-  // Bloqueia ações para o perfil viewer
-  if (state.role === "viewer") return;
-
-  // ... lógica de editar / excluir
-});
-```
-
-## Como testar
+## Como reproduzir o bug
 
 1. Abra `index.html` no navegador (perfil padrão: **Viewer**)
-2. Clique em **Editar** ou **Excluir** em qualquer card — nenhuma ação deve ocorrer; contagem permanece em 6
-3. Mude o perfil para **Editor**
-4. Clique em **Excluir** — cliente é removido; clique em **Editar** — prompt para novo nome aparece
-5. Volte para **Viewer** — ações bloqueadas novamente
+2. Clique em **Excluir** em qualquer card
+3. Observe que o cliente é removido mesmo com perfil `viewer`
+4. Atualize a página e clique em **Editar** em qualquer card
+5. Observe que é possível alterar o nome mesmo com perfil `viewer`
 
-## Risco / Regressão
+## Critérios de aceitação
 
-Mudança mínima: uma única linha adicionada ao handler existente.  
-Sem refatoração, sem alteração de estrutura. Risco de regressão é baixo.
+- Com `role = viewer`, botões **Editar** e **Excluir** devem permanecer visíveis, porém desabilitados
+- Com `role = viewer`, deve existir tooltip com a mensagem: **"Essa ação não é permitida para este perfil"**
+- Com `role = viewer`, cliques em ações não podem executar nenhuma alteração
+- Com `role = editor`, ações de edição e exclusão devem funcionar normalmente
