@@ -17,7 +17,10 @@ const els = {
   list: document.getElementById("list"),
   rolePill: document.getElementById("rolePill"),
   countPill: document.getElementById("countPill"),
+  deleteModal: document.getElementById("deleteModal"),
 };
+/** ID do cliente em espera de confirmação de exclusão (null quando modal fechado) */
+let pendingDeleteId = null;
 
 function setRole(role) {
   state.role = role;
@@ -74,8 +77,9 @@ els.list.addEventListener("click", (e) => {
   const action = btn.dataset.action;
 
   if (action === "delete") {
-    state.customers = state.customers.filter((c) => c.id !== id);
-    render();
+    pendingDeleteId = id;
+    els.deleteModal.hidden = false;
+    els.deleteModal.querySelector(".modal-content").focus();
     return;
   }
 
@@ -88,6 +92,33 @@ els.list.addEventListener("click", (e) => {
       c.id === id ? { ...c, name: newName } : c
     );
     render();
+  }
+});
+
+function closeDeleteModal() {
+  pendingDeleteId = null;
+  els.deleteModal.hidden = true;
+}
+
+function confirmDelete() {
+  if (pendingDeleteId == null) return;
+  state.customers = state.customers.filter((c) => c.id !== pendingDeleteId);
+  closeDeleteModal();
+  render();
+}
+
+els.deleteModal.addEventListener("click", (e) => {
+  const action = e.target.closest("[data-action]")?.dataset?.action;
+  if (action === "confirm") {
+    confirmDelete();
+  } else if (action === "cancel") {
+    closeDeleteModal();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !els.deleteModal.hidden) {
+    closeDeleteModal();
   }
 });
 
