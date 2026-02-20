@@ -19,6 +19,12 @@ const els = {
   countPill: document.getElementById("countPill"),
 };
 
+const VIEWER_TOOLTIP = "Essa ação não é permitida para este perfil";
+
+function canMutate() {
+  return state.role === "editor";
+}
+
 function setRole(role) {
   state.role = role;
   render();
@@ -35,14 +41,29 @@ function filteredCustomers() {
   return state.customers.filter((c) => c.name.toLowerCase().includes(q));
 }
 
-function render() {
-  els.rolePill.textContent = `Perfil atual: ${state.role}`;
-  const data = filteredCustomers();
-  els.countPill.textContent = `${data.length} cliente(s)`;
+function actionButtonAttrs() {
+  if (canMutate()) {
+    return {
+      disabledAttr: "",
+      className: "",
+      title: "",
+      ariaDisabled: "false",
+    };
+  }
 
-  els.list.innerHTML = data
+  return {
+    disabledAttr: "disabled",
+    className: "is-disabled",
+    title: VIEWER_TOOLTIP,
+    ariaDisabled: "true",
+  };
+}
+
+function renderList(targetEl, data) {
+  const attrs = actionButtonAttrs();
+
+  targetEl.innerHTML = data
     .map((c) => {
-
       return `
         <article class="card" data-id="${c.id}">
           <div class="head">
@@ -54,8 +75,8 @@ function render() {
           </div>
 
           <div class="actions">
-            <button class="" data-action="edit">Editar</button>
-            <button class="danger " data-action="delete">Excluir</button>
+            <button class="${attrs.className}" data-action="edit" ${attrs.disabledAttr} title="${attrs.title}" aria-disabled="${attrs.ariaDisabled}">Editar</button>
+            <button class="danger ${attrs.className}" data-action="delete" ${attrs.disabledAttr} title="${attrs.title}" aria-disabled="${attrs.ariaDisabled}">Excluir</button>
           </div>
         </article>
       `;
@@ -63,9 +84,21 @@ function render() {
     .join("");
 }
 
+function render() {
+  els.rolePill.textContent = `Perfil atual: ${state.role}`;
+  const data = filteredCustomers();
+  els.countPill.textContent = `${data.length} cliente(s)`;
+
+  renderList(els.list, data);
+}
+
 els.list.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-action]");
   if (!btn) return;
+
+  if (!canMutate() || btn.hasAttribute("disabled")) {
+    return;
+  }
 
   const card = e.target.closest(".card");
   if (!card) return;
@@ -103,4 +136,32 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+function runValidationTests() {
+  const testCustomers = state.customers.slice(0, 1);
+  const temp = document.createElement("div");
+
+  state.role = "viewer";
+  renderList(temp, testCustomers);
+  const viewerButtons = temp.querySelectorAll("button[data-action]");
+  console.assert(
+    Array.from(viewerButtons).every((b) => b.disabled),
+    "[RBAC] Viewer deve ter botões desabilitados"
+  );
+  console.assert(
+    Array.from(viewerButtons).every((b) => b.title === VIEWER_TOOLTIP),
+    "[RBAC] Viewer deve ter tooltip de permissão"
+  );
+
+  state.role = "editor";
+  renderList(temp, testCustomers);
+  const editorButtons = temp.querySelectorAll("button[data-action]");
+  console.assert(
+    Array.from(editorButtons).every((b) => !b.disabled),
+    "[RBAC] Editor deve ter botões habilitados"
+  );
+
+  state.role = els.roleSelect.value;
+}
+
 render();
+runValidationTests();

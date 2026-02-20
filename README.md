@@ -37,3 +37,29 @@ Quando `role = editor`:
 - Com `role = viewer`, deve existir tooltip com a mensagem: **"Essa ação não é permitida para este perfil"**
 - Com `role = viewer`, cliques em ações não podem executar nenhuma alteração
 - Com `role = editor`, ações de edição e exclusão devem funcionar normalmente
+
+## Correção aplicada (Bug 1)
+
+### O que foi feito
+- Centralização da regra de permissão em uma função (`canMutate`) para decidir se o perfil pode editar/excluir.
+- Renderização dos botões com estado **desabilitado** quando o perfil é `viewer`, incluindo:
+	- atributo `disabled`
+	- classe visual `is-disabled`
+	- tooltip com a mensagem **"Essa ação não é permitida para este perfil"**
+	- `aria-disabled` para acessibilidade
+- Bloqueio defensivo no handler de clique para impedir execução caso o perfil não tenha permissão (mesmo que algum botão seja reabilitado via devtools).
+
+### Por que resolve
+Essas mudanças garantem o controle de acesso (RBAC) em duas camadas:
+1. **UI**: o usuário `viewer` não consegue iniciar ações, pois os botões ficam desabilitados e exibem o tooltip esperado.
+2. **Lógica**: mesmo com tentativa de execução via DOM, a ação é bloqueada antes de alterar dados.
+
+## Testes de validação
+
+Testes simples foram adicionados em `app.js` (função `runValidationTests`) e executados automaticamente no carregamento:
+
+- Valida que o perfil `viewer` gera botões desabilitados
+- Valida que o perfil `viewer` aplica tooltip correto
+- Valida que o perfil `editor` gera botões habilitados
+
+Os resultados aparecem no console do navegador via `console.assert`.
